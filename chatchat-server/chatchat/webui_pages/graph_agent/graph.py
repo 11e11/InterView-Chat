@@ -297,7 +297,15 @@ async def graph_agent_page():
         st.title("LLM 聊天")
         with st.chat_message(name="assistant", avatar=st.session_state["assistant_avatar"]):
             st.write("Hello 👋😊，我是聊天机器人，试着输入任何内容和我聊天呦～（ps: 可尝试选择多种工具）")
-
+    # st.write(f"DEBUG: selected_graph = '{selected_graph}'")
+    if selected_graph == "简历打分+面试模拟Agent":
+        uploaded_file = st.file_uploader(
+            "📎 上传简历（PDF/DOCX），或直接在下方输入文字",
+            type=["pdf", "docx"],
+            key="resume_uploader",
+        )
+    else:
+        uploaded_file = None
     with bottom():
         cols = st.columns([1, 0.2, 15, 1])
         if cols[0].button(":gear:", help="模型配置"):
@@ -309,6 +317,32 @@ async def graph_agent_page():
             user_input = cols[2].chat_input("尝试输入任何内容和我聊天呦 (换行:Shift+Enter)")
         elif selected_graph == "数据库查询机器人[Beta]":
             user_input = cols[2].chat_input("尝试输入任何内容和我聊天呦 (换行:Shift+Enter)")
+        elif selected_graph == "简历打分+面试模拟Agent":
+            user_input = cols[2].chat_input("或直接粘贴简历文本 / 输入对话内容 (换行:Shift+Enter)")
+            if uploaded_file is not None and "last_uploaded_file" not in st.session_state:
+                import os, tempfile
+                st.session_state["last_uploaded_file"] = uploaded_file.name
+                suffix = os.path.splitext(uploaded_file.name)[1].lower()
+                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+                try:
+                    if suffix == ".pdf":
+                        from chatchat.server.file_rag.document_loaders.mypdfloader import RapidOCRPDFLoader
+                        loader = RapidOCRPDFLoader(tmp_path)
+                    else:
+                        from chatchat.server.file_rag.document_loaders.mydocloader import RapidOCRDocLoader
+                        loader = RapidOCRDocLoader(tmp_path)
+                    docs = loader.load()
+                    resume_text = "\n".join(doc.page_content for doc in docs).strip()
+                except Exception as e:
+                    resume_text = f"[文件解析失败: {e}，请直接粘贴简历文本]"
+                finally:
+                    os.unlink(tmp_path)
+                user_input = f"请对以下简历进行打分，然后开始面试模拟：\n\n{resume_text}"
+                # st.write(f"已成功解析简历文本，{resume_text}")
+            if uploaded_file is None:
+                st.session_state.pop("last_uploaded_file", None)
         else:
             user_input = cols[2].chat_input("尝试输入任何内容和我聊天呦 (换行:Shift+Enter)")
 
