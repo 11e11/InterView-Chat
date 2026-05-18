@@ -293,6 +293,22 @@ class LocalAIEmbeddings(BaseModel, Embeddings):
             .data[0]
             .embedding
         )
+    # def _embedding_func(self, text: str, *, engine: str) -> List[float]:
+    #     """Call out to LocalAI's embedding endpoint."""
+    #     # handle large input text
+    #     if self.model.endswith("001"):
+    #         # See: https://github.com/openai/openai-python/issues/418#issuecomment-1525939500
+    #         # replace newlines, which can negatively affect performance.
+    #         text = text.replace("\n", " ")
+    #     return (
+    #         embed_with_retry(
+    #             self,
+    #             input=text,  # <--- 关键修改：去掉包围 text 的中括号 []
+    #             **self._invocation_params,
+    #         )
+    #         .data[0]
+    #         .embedding
+    #     )
 
     async def _aembedding_func(self, text: str, *, engine: str) -> List[float]:
         """Call out to LocalAI's embedding endpoint."""
@@ -312,6 +328,24 @@ class LocalAIEmbeddings(BaseModel, Embeddings):
             .data[0]
             .embedding
         )
+    # async def _aembedding_func(self, text: str, *, engine: str) -> List[float]:
+    #     """Call out to LocalAI's embedding endpoint."""
+    #     # handle large input text
+    #     if self.model.endswith("001"):
+    #         # See: https://github.com/openai/openai-python/issues/418#issuecomment-1525939500
+    #         # replace newlines, which can negatively affect performance.
+    #         text = text.replace("\n", " ")
+    #     return (
+    #         (
+    #             await async_embed_with_retry(
+    #                 self,
+    #                 input=text, # <--- 关键修改：去掉包围 text 的中括号 []
+    #                 **self._invocation_params,
+    #             )
+    #         )
+    #         .data[0]
+    #         .embedding
+    #     )
 
     def embed_documents(
         self, texts: List[str], chunk_size: Optional[int] = 0
