@@ -17,7 +17,6 @@
 和 [AlexZhangji](https://github.com/AlexZhangji)
 创建的 [ChatGLM-6B Pull Request](https://github.com/THUDM/ChatGLM-6B/pull/216)
 启发，建立了全流程可使用开源模型实现的本地知识库问答应用。
-![](docs/img/langchain_chatchat_0.3.0.png)
 
 ✅ 支持市面上主流的开源 LLM、 Embedding 模型与向量数据库，可实现全部使用**开源**模型**离线私有部署**。与此同时，本项目也支持
 OpenAI GPT API 的调用，并将在后续持续扩充对各类模型及模型 API 的接入。
